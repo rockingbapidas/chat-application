@@ -1,7 +1,8 @@
 package com.example.whatsappsample.data.remote.firebase
 
 import androidx.core.net.toUri
-import com.example.whatsappsample.domain.auth.model.User
+import com.example.whatsappsample.data.remote.AuthRemoteSource
+import com.example.whatsappsample.data.remote.dto.UserDto
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -10,20 +11,23 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class FirebaseAuthImpl @Inject constructor(
+@Singleton
+class FirebaseAuthRemoteSourceImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth
-) {
-    val currentUser: Flow<User?> = callbackFlow {
+) : AuthRemoteSource {
+
+    override val currentUser: Flow<UserDto?> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener { auth ->
             val user = auth.currentUser
-            trySend(user?.toDomainUser())
+            trySend(user?.toDto())
         }
         firebaseAuth.addAuthStateListener(listener)
         awaitClose { firebaseAuth.removeAuthStateListener(listener) }
     }
 
-    val isUserAuthenticated: Flow<Boolean> = callbackFlow {
+    override val isUserAuthenticated: Flow<Boolean> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener { auth ->
             trySend(auth.currentUser != null)
         }
@@ -31,16 +35,16 @@ class FirebaseAuthImpl @Inject constructor(
         awaitClose { firebaseAuth.removeAuthStateListener(listener) }
     }
 
-    suspend fun signIn(email: String, password: String): Result<User> {
+    override suspend fun signIn(email: String, password: String): Result<UserDto> {
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            Result.success(result.user?.toDomainUser() ?: throw IllegalStateException("User is null"))
+            Result.success(result.user?.toDto() ?: throw IllegalStateException("User is null"))
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun signUp(email: String, password: String, name: String): Result<User> {
+    override suspend fun signUp(email: String, password: String, name: String): Result<UserDto> {
         return try {
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             result.user?.updateProfile(
@@ -48,17 +52,17 @@ class FirebaseAuthImpl @Inject constructor(
                     .setDisplayName(name)
                     .build()
             )?.await()
-            Result.success(result.user?.toDomainUser() ?: throw IllegalStateException("User is null"))
+            Result.success(result.user?.toDto() ?: throw IllegalStateException("User is null"))
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun signOut() {
+    override suspend fun signOut() {
         firebaseAuth.signOut()
     }
 
-    suspend fun resetPassword(email: String): Result<Unit> {
+    override suspend fun resetPassword(email: String): Result<Unit> {
         return try {
             firebaseAuth.sendPasswordResetEmail(email).await()
             Result.success(Unit)
@@ -67,7 +71,7 @@ class FirebaseAuthImpl @Inject constructor(
         }
     }
 
-    suspend fun updateProfile(name: String?, photoUrl: String?): Result<Unit> {
+    override suspend fun updateProfile(name: String?, photoUrl: String?): Result<Unit> {
         return try {
             val profileUpdates = UserProfileChangeRequest.Builder()
             name?.let { profileUpdates.setDisplayName(it) }
@@ -79,7 +83,7 @@ class FirebaseAuthImpl @Inject constructor(
         }
     }
 
-    suspend fun deleteAccount(): Result<Unit> {
+    override suspend fun deleteAccount(): Result<Unit> {
         return try {
             firebaseAuth.currentUser?.delete()?.await()
             Result.success(Unit)
@@ -88,7 +92,7 @@ class FirebaseAuthImpl @Inject constructor(
         }
     }
 
-    suspend fun updateEmail(newEmail: String): Result<Unit> {
+    override suspend fun updateEmail(newEmail: String): Result<Unit> {
         return try {
             firebaseAuth.currentUser?.updateEmail(newEmail)?.await()
             Result.success(Unit)
@@ -97,7 +101,7 @@ class FirebaseAuthImpl @Inject constructor(
         }
     }
 
-    suspend fun updatePassword(newPassword: String): Result<Unit> {
+    override suspend fun updatePassword(newPassword: String): Result<Unit> {
         return try {
             firebaseAuth.currentUser?.updatePassword(newPassword)?.await()
             Result.success(Unit)
@@ -106,8 +110,8 @@ class FirebaseAuthImpl @Inject constructor(
         }
     }
 
-    private fun FirebaseUser.toDomainUser(): User {
-        return User(
+    private fun FirebaseUser.toDto(): UserDto {
+        return UserDto(
             id = uid,
             name = displayName ?: "",
             email = email ?: "",

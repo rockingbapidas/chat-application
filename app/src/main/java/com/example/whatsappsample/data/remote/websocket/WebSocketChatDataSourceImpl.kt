@@ -3,6 +3,7 @@ package com.example.whatsappsample.data.remote.websocket
 import com.example.whatsappsample.data.remote.ChatRemoteDataSource
 import com.example.whatsappsample.data.remote.dto.ChatDto
 import com.example.whatsappsample.data.remote.dto.MessageDto
+import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
@@ -37,8 +38,8 @@ class WebSocketChatDataSourceImpl @Inject constructor(
     }
 
     override suspend fun sendMessage(chatId: String, message: MessageDto) {
-        val json = Json.encodeToString(MessageDto.serializer(), message)
-        webSocketManager.send(json)
+        val data = Json.encodeToString(MessageDto.serializer(), message)
+        webSocketManager.getConnection()?.send(Frame.Text(data))
     }
 
     override suspend fun createChat(chat: ChatDto): Flow<ChatDto> = flow {

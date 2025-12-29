@@ -2,6 +2,7 @@ package com.example.whatsappsample.data.remote.xmpp
 
 import android.content.Context
 import android.util.Log
+import com.example.whatsappsample.data.remote.dto.ConnectionState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -83,11 +84,4 @@ class XmppManager @Inject constructor(
     }
 
     fun getConnection(): AbstractXMPPConnection? = connection
-
-    sealed class ConnectionState {
-        object Disconnected : ConnectionState()
-        object Connecting : ConnectionState()
-        object Connected : ConnectionState()
-        data class Error(val message: String) : ConnectionState()
-    }
 }
