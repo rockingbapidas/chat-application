@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WhatsApp Sample</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="name">Name</string>
+    <string name="phone">Phone</string>
+    <string name="chats">Chats</string>
+    <string name="profile">Profile</string>
+    <string name="status">Status</string>
+    <string name="calls">Calls</string>
+    <string name="search">Search</string>
+    <string name="new_chat">New Chat</string>
+    <string name="type_message">Type a message</string>
+    <string name="send">Send</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="document">Document</string>
+    <string name="audio">Audio</string>
+    <string name="location">Location</string>
+    <string name="contact">Contact</string>
+</resources> 
