@@ -1,5 +1,6 @@
 package com.example.whatsappsample.data.repository
 
+import com.example.whatsappsample.data.local.AppPreferences
 import com.example.whatsappsample.data.remote.AuthRemoteSource
 import com.example.whatsappsample.domain.auth.model.User
 import com.example.whatsappsample.domain.auth.repository.AuthRepository
@@ -10,12 +11,13 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
-    private val authRemoteSource: AuthRemoteSource
+    private val authRemoteSource: AuthRemoteSource,
+    appPreferences: AppPreferences
 ) : AuthRepository {
 
-    override val currentUser: Flow<User?> = authRemoteSource.currentUser.map { it?.toDomain() }
+    override val currentUser: Flow<User?> = appPreferences.currentUser.map { it?.toDomain() }
 
-    override val isUserAuthenticated: Flow<Boolean> = authRemoteSource.isUserAuthenticated
+    override val isUserAuthenticated: Flow<Boolean> = appPreferences.isAuthenticated
 
     override suspend fun signIn(email: String, password: String): Result<User> {
         return authRemoteSource.signIn(email, password).map { it.toDomain() }

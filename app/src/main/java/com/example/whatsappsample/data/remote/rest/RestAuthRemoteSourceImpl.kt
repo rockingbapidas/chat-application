@@ -1,6 +1,6 @@
 package com.example.whatsappsample.data.remote.rest
 
-import com.example.whatsappsample.data.local.SessionManager
+import com.example.whatsappsample.data.local.AppPreferences
 import com.example.whatsappsample.data.remote.AuthRemoteSource
 import com.example.whatsappsample.data.remote.dto.AuthRequest
 import com.example.whatsappsample.data.remote.dto.AuthResponse
@@ -14,23 +14,19 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class RestAuthRemoteSourceImpl @Inject constructor(
     private val client: HttpClient,
-    private val sessionManager: SessionManager
+    private val appPreferences: AppPreferences
 ) : AuthRemoteSource {
 
     private val baseUrl = "https://api.example.com/v1" // Replace with actual API base URL
 
-    private val _currentUser = MutableStateFlow<UserDto?>(null)
-    override val currentUser: Flow<UserDto?> = _currentUser
-
-    private val _isUserAuthenticated = MutableStateFlow(sessionManager.getToken() != null)
-    override val isUserAuthenticated: Flow<Boolean> = _isUserAuthenticated
+    override val currentUser: Flow<UserDto?> = appPreferences.currentUser
+    override val isUserAuthenticated: Flow<Boolean> = appPreferences.isAuthenticated
 
     override suspend fun signIn(email: String, password: String): Result<UserDto> {
         return try {
@@ -39,9 +35,8 @@ class RestAuthRemoteSourceImpl @Inject constructor(
                 setBody(AuthRequest(email = email, password = password))
             }.body()
             
-            sessionManager.saveToken(response.token)
-            _currentUser.value = response.user
-            _isUserAuthenticated.value = true
+            appPreferences.saveToken(response.token)
+            appPreferences.saveUser(response.user)
             Result.success(response.user)
         } catch (e: Exception) {
             Result.failure(e)
@@ -55,9 +50,8 @@ class RestAuthRemoteSourceImpl @Inject constructor(
                 setBody(AuthRequest(email = email, password = password, name = name))
             }.body()
             
-            sessionManager.saveToken(response.token)
-            _currentUser.value = response.user
-            _isUserAuthenticated.value = true
+            appPreferences.saveToken(response.token)
+            appPreferences.saveUser(response.user)
             Result.success(response.user)
         } catch (e: Exception) {
             Result.failure(e)
@@ -68,11 +62,9 @@ class RestAuthRemoteSourceImpl @Inject constructor(
         try {
             client.post("$baseUrl/auth/logout")
         } catch (e: Exception) {
-            // Log error but proceed to clear local session
+            // Log error
         } finally {
-            sessionManager.clear()
-            _currentUser.value = null
-            _isUserAuthenticated.value = false
+            appPreferences.clear()
         }
     }
 
@@ -94,7 +86,7 @@ class RestAuthRemoteSourceImpl @Inject constructor(
                 contentType(ContentType.Application.Json)
                 setBody(mapOf("name" to name, "photoUrl" to photoUrl))
             }
-            // Fetch updated user info or manually update _currentUser
+            // In a real app, you would fetch the updated user and call authPreferences.saveUser()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

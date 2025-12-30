@@ -4,8 +4,7 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.example.whatsappsample.data.local.ChatLocalDataSource
-import com.example.whatsappsample.data.local.dao.OutboxMessageDao
+import com.example.whatsappsample.data.local.wrapper.ChatDaoWrapper
 import com.example.whatsappsample.data.mapper.toDomain
 import com.example.whatsappsample.data.mapper.toEntity
 import com.example.whatsappsample.data.mapper.toOutboxEntity
@@ -27,7 +26,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ChatRepositoryImpl @Inject constructor(
-    private val localDataSource: ChatLocalDataSource,
+    private val localDataSource: ChatDaoWrapper,
     private val remoteDataSource: ChatRemoteDataSource,
     private val workManager: WorkManager
 ) : ChatRepository {

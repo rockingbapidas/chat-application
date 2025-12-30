@@ -1,6 +1,6 @@
 package com.example.whatsappsample.di
 
-import com.example.whatsappsample.data.remote.AuthSourceWrapper
+import com.example.whatsappsample.data.remote.wrapper.AuthSourceWrapper
 import com.example.whatsappsample.data.remote.AuthRemoteSource
 import com.example.whatsappsample.data.remote.firebase.FirebaseAuthRemoteSourceImpl
 import com.example.whatsappsample.data.remote.rest.RestAuthRemoteSourceImpl

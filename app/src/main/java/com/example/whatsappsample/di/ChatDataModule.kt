@@ -1,8 +1,8 @@
 package com.example.whatsappsample.di
 
-import com.example.whatsappsample.data.remote.ChatDataSourceWrapper
-import com.example.whatsappsample.data.local.ChatLocalDataSource
-import com.example.whatsappsample.data.local.ChatLocalDataSourceImpl
+import com.example.whatsappsample.data.remote.wrapper.ChatDataSourceWrapper
+import com.example.whatsappsample.data.local.wrapper.ChatDaoWrapper
+import com.example.whatsappsample.data.local.wrapper.ChatDaoWrapperImpl
 import com.example.whatsappsample.data.remote.ChatRemoteDataSource
 import com.example.whatsappsample.data.remote.firebase.FirebaseChatDataSourceImpl
 import com.example.whatsappsample.data.remote.xmpp.XmppChatDataSourceImpl
@@ -21,7 +21,7 @@ import javax.inject.Singleton
 abstract class ChatDataModule {
     @Binds
     @Singleton
-    abstract fun bindChatLocalDataSource(chatLocalDataSource: ChatLocalDataSourceImpl): ChatLocalDataSource
+    abstract fun bindChatLocalDataSource(chatLocalDataSource: ChatDaoWrapperImpl): ChatDaoWrapper
 
     @Binds
     @Singleton

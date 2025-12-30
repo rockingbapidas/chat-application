@@ -1,6 +1,7 @@
 package com.example.whatsappsample.data.remote.firebase
 
 import androidx.core.net.toUri
+import com.example.whatsappsample.data.local.AppPreferences
 import com.example.whatsappsample.data.remote.AuthRemoteSource
 import com.example.whatsappsample.data.remote.dto.UserDto
 import com.google.firebase.auth.FirebaseAuth
@@ -9,22 +10,27 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class FirebaseAuthRemoteSourceImpl @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val appPreferences: AppPreferences
 ) : AuthRemoteSource {
 
     override val currentUser: Flow<UserDto?> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener { auth ->
             val user = auth.currentUser
-            trySend(user?.toDto())
+            val dto = user?.toDto()
+            trySend(dto)
         }
         firebaseAuth.addAuthStateListener(listener)
         awaitClose { firebaseAuth.removeAuthStateListener(listener) }
+    }.onEach { dto ->
+        dto?.let { appPreferences.saveUser(it) }
     }
 
     override val isUserAuthenticated: Flow<Boolean> = callbackFlow {
@@ -38,7 +44,9 @@ class FirebaseAuthRemoteSourceImpl @Inject constructor(
     override suspend fun signIn(email: String, password: String): Result<UserDto> {
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            Result.success(result.user?.toDto() ?: throw IllegalStateException("User is null"))
+            val dto = result.user?.toDto() ?: throw IllegalStateException("User is null")
+            appPreferences.saveUser(dto)
+            Result.success(dto)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -52,7 +60,9 @@ class FirebaseAuthRemoteSourceImpl @Inject constructor(
                     .setDisplayName(name)
                     .build()
             )?.await()
-            Result.success(result.user?.toDto() ?: throw IllegalStateException("User is null"))
+            val dto = result.user?.toDto() ?: throw IllegalStateException("User is null")
+            appPreferences.saveUser(dto)
+            Result.success(dto)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -60,6 +70,7 @@ class FirebaseAuthRemoteSourceImpl @Inject constructor(
 
     override suspend fun signOut() {
         firebaseAuth.signOut()
+        appPreferences.clear()
     }
 
     override suspend fun resetPassword(email: String): Result<Unit> {
@@ -77,6 +88,7 @@ class FirebaseAuthRemoteSourceImpl @Inject constructor(
             name?.let { profileUpdates.setDisplayName(it) }
             photoUrl?.let { profileUpdates.setPhotoUri(it.toUri()) }
             firebaseAuth.currentUser?.updateProfile(profileUpdates.build())?.await()
+            firebaseAuth.currentUser?.toDto()?.let { appPreferences.saveUser(it) }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -86,6 +98,7 @@ class FirebaseAuthRemoteSourceImpl @Inject constructor(
     override suspend fun deleteAccount(): Result<Unit> {
         return try {
             firebaseAuth.currentUser?.delete()?.await()
+            signOut()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -95,6 +108,7 @@ class FirebaseAuthRemoteSourceImpl @Inject constructor(
     override suspend fun updateEmail(newEmail: String): Result<Unit> {
         return try {
             firebaseAuth.currentUser?.updateEmail(newEmail)?.await()
+            firebaseAuth.currentUser?.toDto()?.let { appPreferences.saveUser(it) }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

@@ -1,5 +1,6 @@
-package com.example.whatsappsample.data.remote
+package com.example.whatsappsample.data.remote.wrapper
 
+import com.example.whatsappsample.data.remote.ChatRemoteDataSource
 import com.example.whatsappsample.data.remote.dto.ChatDto
 import com.example.whatsappsample.data.remote.dto.MessageDto
 import kotlinx.coroutines.flow.Flow

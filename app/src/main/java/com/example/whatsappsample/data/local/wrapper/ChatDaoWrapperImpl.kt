@@ -1,4 +1,4 @@
-package com.example.whatsappsample.data.local
+package com.example.whatsappsample.data.local.wrapper
 
 import com.example.whatsappsample.data.local.dao.ChatDao
 import com.example.whatsappsample.data.local.dao.MessageDao
@@ -11,11 +11,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ChatLocalDataSourceImpl @Inject constructor(
+class ChatDaoWrapperImpl @Inject constructor(
     private val chatDao: ChatDao,
     private val messageDao: MessageDao,
     private val outboxMessageDao: OutboxMessageDao
-) : ChatLocalDataSource {
+) : ChatDaoWrapper {
     override fun getChats(): Flow<List<ChatEntity>> = chatDao.getAllChats()
 
     override fun getChat(chatId: String): Flow<ChatEntity?> = chatDao.getChatById(chatId)

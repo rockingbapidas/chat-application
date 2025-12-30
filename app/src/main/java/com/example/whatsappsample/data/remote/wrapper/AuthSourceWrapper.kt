@@ -1,5 +1,6 @@
-package com.example.whatsappsample.data.remote
+package com.example.whatsappsample.data.remote.wrapper
 
+import com.example.whatsappsample.data.remote.AuthRemoteSource
 import com.example.whatsappsample.data.remote.dto.UserDto
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

@@ -1,11 +1,11 @@
-package com.example.whatsappsample.data.local
+package com.example.whatsappsample.data.local.wrapper
 
 import com.example.whatsappsample.data.local.entity.ChatEntity
 import com.example.whatsappsample.data.local.entity.MessageEntity
 import com.example.whatsappsample.data.local.entity.OutboxMessageEntity
 import kotlinx.coroutines.flow.Flow
 
-interface ChatLocalDataSource {
+interface ChatDaoWrapper {
     fun getChats(): Flow<List<ChatEntity>>
     fun getChat(chatId: String): Flow<ChatEntity?>
     fun getMessages(chatId: String): Flow<List<MessageEntity>>

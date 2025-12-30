@@ -1,6 +1,6 @@
 package com.example.whatsappsample.di
 
-import com.example.whatsappsample.data.remote.UserDataSourceWrapper
+import com.example.whatsappsample.data.remote.wrapper.UserDataSourceWrapper
 import com.example.whatsappsample.data.remote.UserRemoteDataSource
 import com.example.whatsappsample.data.remote.firebase.FirebaseUserDataSourceImpl
 import com.example.whatsappsample.data.remote.xmpp.XmppUserDataSourceImpl
