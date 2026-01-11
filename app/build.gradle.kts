@@ -117,6 +117,14 @@ dependencies {
     androidTestImplementation(libs.composeUiTestJunit4)
     debugImplementation(libs.composeUiTooling)
     debugImplementation(libs.composeUiTestManifest)
+
+    // Paging 3
+    implementation(libs.pagingRuntime)
+    implementation(libs.pagingCompose)
+    implementation(libs.roomPaging)
+
+    // Coil
+    implementation(libs.coilCompose)
 }
 
 configurations {

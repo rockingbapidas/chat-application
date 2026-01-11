@@ -18,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.example.whatsappsample.domain.chat.model.Message
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -30,14 +32,9 @@ fun ChatScreen(
     viewModel: ChatViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val messages = viewModel.messages.collectAsLazyPagingItems()
     var messageText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
-
-    LaunchedEffect(state.messages.size) {
-        if (state.messages.isNotEmpty()) {
-            listState.animateScrollToItem(state.messages.size - 1)
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -65,10 +62,20 @@ fun ChatScreen(
                     .fillMaxWidth(),
                 state = listState,
                 contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                reverseLayout = true
             ) {
-                items(state.messages.size) { index ->
-                    MessageItem(message = state.messages[index])
+                items(
+                    count = messages.itemCount,
+                    key = messages.itemKey { it.id }
+                ) { index ->
+                    val message = messages[index]
+                    if (message != null) {
+                        MessageItem(
+                            message = message,
+                            currentUserId = state.currentUserId
+                        )
+                    }
                 }
             }
 
@@ -107,14 +114,17 @@ fun ChatScreen(
 }
 
 @Composable
-private fun MessageItem(message: Message) {
-    val isCurrentUser = message.senderId == "current_user_id" // TODO: Replace with actual user ID
+private fun MessageItem(
+    message: Message,
+    currentUserId: String
+) {
+    val isCurrentUser = message.senderId == currentUserId
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = if (isCurrentUser) Alignment.End else Alignment.Start
     ) {
         Surface(
-            modifier = Modifier.widthIn(max = 340.dp),
+            modifier = Modifier.widthIn(max = 300.dp),
             shape = MaterialTheme.shapes.medium,
             color = if (isCurrentUser) 
                 MaterialTheme.colorScheme.primary 

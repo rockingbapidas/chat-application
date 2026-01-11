@@ -23,6 +23,9 @@ smack = "4.4.8"
 junit = "4.13.2"
 androidxTestExtJunit = "1.1.5"
 espressoCore = "3.5.1"
+paging = "3.2.1"
+coil = "2.5.0"
+
 
 [libraries]
 firebaseAuthKtx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
@@ -63,6 +66,11 @@ espressoCore = { group = "androidx.test.espresso", name = "espresso-core", versi
 composeUiTestJunit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 composeUiTooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 composeUiTestManifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+pagingRuntime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
+pagingCompose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
+roomPaging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
+coilCompose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 hilt-android-gradlePlugin = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hilt" }

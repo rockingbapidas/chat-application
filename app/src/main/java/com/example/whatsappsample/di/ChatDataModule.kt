@@ -8,7 +8,9 @@ import com.example.whatsappsample.data.remote.firebase.FirebaseChatDataSourceImp
 import com.example.whatsappsample.data.remote.xmpp.XmppChatDataSourceImpl
 import com.example.whatsappsample.data.remote.websocket.WebSocketChatDataSourceImpl
 import com.example.whatsappsample.data.repository.ChatRepositoryImpl
+import com.example.whatsappsample.data.repository.SyncRepositoryImpl
 import com.example.whatsappsample.domain.chat.repository.ChatRepository
+import com.example.whatsappsample.domain.chat.repository.SyncRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -41,6 +43,10 @@ abstract class ChatDataModule {
     @Binds
     @Singleton
     abstract fun bindChatRemoteDataSource(chatDataSourceWrapper: ChatDataSourceWrapper): ChatRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindSyncRepository(syncRepository: SyncRepositoryImpl): SyncRepository
 
     @Binds
     @Singleton

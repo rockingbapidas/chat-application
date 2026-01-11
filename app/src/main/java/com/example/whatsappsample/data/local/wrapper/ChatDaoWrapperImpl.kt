@@ -7,6 +7,7 @@ import com.example.whatsappsample.data.local.entity.ChatEntity
 import com.example.whatsappsample.data.local.entity.MessageEntity
 import com.example.whatsappsample.data.local.entity.OutboxMessageEntity
 import kotlinx.coroutines.flow.Flow
+import androidx.paging.PagingSource
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,6 +22,8 @@ class ChatDaoWrapperImpl @Inject constructor(
     override fun getChat(chatId: String): Flow<ChatEntity?> = chatDao.getChatById(chatId)
 
     override fun getMessages(chatId: String): Flow<List<MessageEntity>> = messageDao.getMessagesForChat(chatId)
+
+    override fun getMessagesPaging(chatId: String): PagingSource<Int, MessageEntity> = messageDao.getMessagesPaging(chatId)
 
     override fun getMessage(messageId: String): Flow<MessageEntity?> = messageDao.getMessageById(messageId)
 

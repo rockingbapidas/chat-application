@@ -23,7 +23,11 @@ class WebSocketChatDataSourceImpl @Inject constructor(
         emit(ChatDto(id = chatId))
     }
 
-    override fun getMessages(chatId: String): Flow<MessageDto> {
+    override fun getMessages(
+        chatId: String,
+        limit: Int,
+        beforeTimestamp: Long?
+    ): Flow<List<MessageDto>> {
         return webSocketManager.events
             .map { json ->
                 // Example decoding
@@ -35,6 +39,7 @@ class WebSocketChatDataSourceImpl @Inject constructor(
             }
             .filterNotNull()
             .filter { it.chatId == chatId }
+            .map { listOf(it) }
     }
 
     override suspend fun sendMessage(chatId: String, message: MessageDto) {

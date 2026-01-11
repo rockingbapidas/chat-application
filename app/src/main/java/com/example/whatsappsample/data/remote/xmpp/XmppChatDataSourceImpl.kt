@@ -33,16 +33,22 @@ class XmppChatDataSourceImpl @Inject constructor(
         emit(ChatDto(id = chatId, participants = listOf(chatId)))
     }
 
-    override fun getMessages(chatId: String): Flow<MessageDto> = callbackFlow {
+    override fun getMessages(
+        chatId: String,
+        limit: Int,
+        beforeTimestamp: Long?
+    ): Flow<List<MessageDto>> = callbackFlow {
         val listener = org.jivesoftware.smack.chat2.IncomingChatMessageListener { from, message, chat ->
             if (from.asBareJid().toString() == chatId) {
                 trySend(
-                    MessageDto(
-                        id = message.stanzaId ?: UUID.randomUUID().toString(),
-                        content = message.body ?: "",
-                        senderId = from.asBareJid().toString(),
-                        chatId = chatId,
-                        timestamp = System.currentTimeMillis()
+                    listOf(
+                        MessageDto(
+                            id = message.stanzaId ?: UUID.randomUUID().toString(),
+                            content = message.body ?: "",
+                            senderId = from.asBareJid().toString(),
+                            chatId = chatId,
+                            timestamp = System.currentTimeMillis()
+                        )
                     )
                 )
             }

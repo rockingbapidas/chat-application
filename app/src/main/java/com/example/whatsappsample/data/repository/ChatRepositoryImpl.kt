@@ -1,9 +1,15 @@
 package com.example.whatsappsample.data.repository
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.example.whatsappsample.data.local.AppPreferences
 import com.example.whatsappsample.data.local.wrapper.ChatDaoWrapper
 import com.example.whatsappsample.data.mapper.toDomain
 import com.example.whatsappsample.data.mapper.toEntity
@@ -11,6 +17,7 @@ import com.example.whatsappsample.data.mapper.toOutboxEntity
 import com.example.whatsappsample.data.remote.ChatRemoteDataSource
 import com.example.whatsappsample.data.remote.dto.ChatDto
 import com.example.whatsappsample.data.remote.dto.MessageDto
+import com.example.whatsappsample.data.repository.paging.MessageRemoteMediator
 import com.example.whatsappsample.domain.worker.OutboxWorker
 import com.example.whatsappsample.domain.chat.model.Chat
 import com.example.whatsappsample.domain.chat.model.Message
@@ -28,8 +35,12 @@ import javax.inject.Singleton
 class ChatRepositoryImpl @Inject constructor(
     private val localDataSource: ChatDaoWrapper,
     private val remoteDataSource: ChatRemoteDataSource,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val appPreferences: AppPreferences
 ) : ChatRepository {
+
+    private val currentUserId: String
+        get() = appPreferences.getCachedUser()?.id ?: "unknown"
 
     override fun getChats(): Flow<List<Chat>> {
         return localDataSource.getChats().map { chatEntities ->
@@ -61,11 +72,30 @@ class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getMessagesPaging(chatId: String): Flow<PagingData<Message>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false,
+                prefetchDistance = 5
+            ),
+            remoteMediator = MessageRemoteMediator(
+                chatId = chatId,
+                chatDao = localDataSource,
+                remoteDataSource = remoteDataSource
+            ),
+            pagingSourceFactory = { localDataSource.getMessagesPaging(chatId) }
+        ).flow.map { pagingData ->
+            pagingData.map { it.toDomain() }
+        }
+    }
+
     override suspend fun sendMessage(chatId: String, content: String) {
         val message = Message(
             id = UUID.randomUUID().toString(),
             content = content,
-            senderId = "current_user_id", // TODO: Replace with actual user ID from auth
+            senderId = currentUserId,
             chatId = chatId,
             timestamp = System.currentTimeMillis(),
             type = MessageType.TEXT
@@ -95,7 +125,7 @@ class ChatRepositoryImpl @Inject constructor(
     override suspend fun createChat(userId: String): Flow<Chat> = flow {
         val chat = Chat(
             id = UUID.randomUUID().toString(),
-            participants = listOf("current_user_id", userId), // TODO: Replace with actual user ID
+            participants = listOf(currentUserId, userId),
             createdAt = System.currentTimeMillis(),
             updatedAt = System.currentTimeMillis()
         )

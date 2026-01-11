@@ -4,6 +4,7 @@ import com.example.whatsappsample.data.remote.ChatRemoteDataSource
 import com.example.whatsappsample.data.remote.dto.ChatDto
 import com.example.whatsappsample.data.remote.dto.MessageDto
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -14,18 +15,28 @@ import javax.inject.Inject
 class FirebaseChatDataSourceImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : ChatRemoteDataSource {
-    override fun getMessages(chatId: String): Flow<MessageDto> = callbackFlow {
-        val listener = firestore.collection("chats").document(chatId).collection("messages")
-            .orderBy("timestamp")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
-                }
-                snapshot?.documents?.mapNotNull { it.toObject(MessageDto::class.java) }?.forEach {
-                    trySend(it)
-                }
+    override fun getMessages(
+        chatId: String,
+        limit: Int,
+        beforeTimestamp: Long?
+    ): Flow<List<MessageDto>> = callbackFlow {
+        var query = firestore.collection("chats").document(chatId).collection("messages")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .limit(limit.toLong())
+
+        if (beforeTimestamp != null) {
+            query = query.whereLessThan("timestamp", beforeTimestamp)
+        }
+
+        val listener = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
             }
+            val messages = snapshot?.documents?.mapNotNull { it.toObject(MessageDto::class.java) }
+                ?: emptyList()
+            trySend(messages)
+        }
         awaitClose { listener.remove() }
     }
 

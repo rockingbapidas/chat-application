@@ -7,7 +7,11 @@ import kotlinx.coroutines.flow.Flow
 interface ChatRemoteDataSource {
     fun getChats(): Flow<List<ChatDto>>
     suspend fun getChat(chatId: String): Flow<ChatDto>
-    fun getMessages(chatId: String): Flow<MessageDto>
+    fun getMessages(
+        chatId: String,
+        limit: Int = 20,
+        beforeTimestamp: Long? = null
+    ): Flow<List<MessageDto>>
     suspend fun sendMessage(chatId: String, message: MessageDto)
     suspend fun createChat(chat: ChatDto): Flow<ChatDto>
     suspend fun deleteChat(chatId: String)

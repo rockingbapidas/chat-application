@@ -23,7 +23,11 @@ class ChatDataSourceWrapper @Inject constructor(
 
     override fun getChats(): Flow<List<ChatDto>> = currentSource.getChats()
     override suspend fun getChat(chatId: String): Flow<ChatDto> = currentSource.getChat(chatId)
-    override fun getMessages(chatId: String): Flow<MessageDto> = currentSource.getMessages(chatId)
+    override fun getMessages(
+        chatId: String,
+        limit: Int,
+        beforeTimestamp: Long?
+    ): Flow<List<MessageDto>> = currentSource.getMessages(chatId, limit, beforeTimestamp)
     override suspend fun sendMessage(chatId: String, message: MessageDto) = currentSource.sendMessage(chatId, message)
     override suspend fun createChat(chat: ChatDto): Flow<ChatDto> = currentSource.createChat(chat)
     override suspend fun deleteChat(chatId: String) = currentSource.deleteChat(chatId)
