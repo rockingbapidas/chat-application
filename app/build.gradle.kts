@@ -1,7 +1,5 @@
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlinAndroid)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.daggerHiltAndroidPlugin)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.ksp)
@@ -89,9 +87,9 @@ dependencies {
 
     // Hilt
     implementation(libs.hiltAndroid)
-    kapt(libs.hiltAndroidCompiler)
+    ksp(libs.hiltAndroidCompiler)
     implementation(libs.hiltWork)
-    kapt(libs.hiltCompiler)
+    ksp(libs.hiltCompiler)
 
     // Ktor for WebSocket
     implementation(libs.ktorClientCore)

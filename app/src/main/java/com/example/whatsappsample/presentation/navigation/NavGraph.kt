@@ -28,7 +28,7 @@ fun NavGraph(
                 }
             }
         } else {
-            // If not authenticated, ensure we go to login
+            // If not authenticated, ensure we go to log in
             val currentRoute = navController.currentDestination?.route
             if (currentRoute != Screen.Login.route && currentRoute != Screen.Register.route) {
                 navController.navigate(Screen.Login.route) {
