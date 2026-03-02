@@ -1,4 +1,4 @@
-package com.example.whatsappsample.data.remote.dto
+package com.example.whatsappsample.connection
 
 sealed class ConnectionState {
     object Disconnected : ConnectionState()

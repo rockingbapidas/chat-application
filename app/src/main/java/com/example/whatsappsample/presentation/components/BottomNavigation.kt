@@ -1,6 +1,7 @@
 package com.example.whatsappsample.presentation.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -23,6 +24,11 @@ fun BottomNavigation(navController: NavController) {
             route = Screen.ChatList.route,
             icon = Icons.Default.Chat,
             label = stringResource(R.string.chats)
+        ),
+        BottomNavItem(
+            route = Screen.CallList.route,
+            icon = Icons.Default.Call,
+            label = stringResource(R.string.calls)
         ),
         BottomNavItem(
             route = Screen.Profile.route,

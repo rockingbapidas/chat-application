@@ -1,8 +1,7 @@
-package com.example.whatsappsample.data.remote.xmpp
+package com.example.whatsappsample.connection
 
 import android.content.Context
 import android.util.Log
-import com.example.whatsappsample.data.remote.dto.ConnectionState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

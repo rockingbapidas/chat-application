@@ -33,11 +33,13 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     val isAuthenticated by viewModel.isAuthenticated.collectAsState()
+                    val connectionState by viewModel.connectionState.collectAsState()
                     
                     if (isAuthenticated != null) {
                         NavGraph(
                             navController = navController,
-                            isAuthenticated = isAuthenticated!!
+                            isAuthenticated = isAuthenticated!!,
+                            connectionState = connectionState
                         )
                     } else {
                         Box(

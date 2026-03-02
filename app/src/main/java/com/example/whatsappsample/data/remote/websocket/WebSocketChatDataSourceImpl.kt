@@ -1,5 +1,6 @@
 package com.example.whatsappsample.data.remote.websocket
 
+import com.example.whatsappsample.connection.WebSocketManager
 import com.example.whatsappsample.data.remote.ChatRemoteDataSource
 import com.example.whatsappsample.data.remote.dto.ChatDto
 import com.example.whatsappsample.data.remote.dto.MessageDto

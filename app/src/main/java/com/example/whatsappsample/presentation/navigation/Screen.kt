@@ -8,6 +8,7 @@ sealed class Screen(val route: String, val arguments: List<NamedNavArgument> = e
     object Login : Screen("login")
     object Register : Screen("register")
     object ChatList : Screen("chat_list")
+    object CallList : Screen("call_list")
     object Profile : Screen("profile")
     object Chat : Screen(
         route = "chat/{chatId}",

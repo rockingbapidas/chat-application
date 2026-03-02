@@ -1,7 +1,6 @@
-package com.example.whatsappsample.data.remote.websocket
+package com.example.whatsappsample.connection
 
 import android.util.Log
-import com.example.whatsappsample.data.remote.dto.ConnectionState
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.webSocket
