@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -37,7 +38,7 @@ class InitialSyncWorker @AssistedInject constructor(
         return try {
             syncRepository.initialSync { current, total, message ->
                 val notification = createNotification(message, current, total)
-                setForeground(ForegroundInfo(NOTIFICATION_ID, notification))
+                setForeground(createForegroundInfo(notification))
             }
             Result.success()
         } catch (e: Exception) {
@@ -50,7 +51,19 @@ class InitialSyncWorker @AssistedInject constructor(
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        return ForegroundInfo(NOTIFICATION_ID, createNotification("Starting sync...", 0, 100))
+        return createForegroundInfo(createNotification("Starting sync...", 0, 100))
+    }
+
+    private fun createForegroundInfo(notification: Notification): ForegroundInfo {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+        } else {
+            ForegroundInfo(NOTIFICATION_ID, notification)
+        }
     }
 
     private fun createNotification(message: String, current: Int, total: Int): Notification {

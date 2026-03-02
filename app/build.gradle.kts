@@ -12,7 +12,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.whatsappsample"
+        applicationId = "com.bapidas.chattingapp"
         minSdk = 24
         versionCode = 1
         versionName = "1.0"
