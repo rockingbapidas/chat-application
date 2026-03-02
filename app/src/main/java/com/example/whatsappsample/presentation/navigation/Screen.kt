@@ -10,6 +10,7 @@ sealed class Screen(val route: String, val arguments: List<NamedNavArgument> = e
     object ChatList : Screen("chat_list")
     object CallList : Screen("call_list")
     object Profile : Screen("profile")
+    object Main : Screen("main")
     object Chat : Screen(
         route = "chat/{chatId}",
         arguments = listOf(navArgument("chatId") { type = NavType.StringType })

@@ -19,20 +19,22 @@ import com.example.whatsappsample.presentation.components.BottomNavigation
 import com.example.whatsappsample.presentation.components.ConnectionStatusStripe
 import com.example.whatsappsample.presentation.profile.ProfileScreen
 
+import com.example.whatsappsample.presentation.main.MainScreen
+
 @Composable
 fun NavGraph(
     navController: NavHostController,
     isAuthenticated: Boolean,
     connectionState: ConnectionState
 ) {
-    val startDestination = if (isAuthenticated) Screen.ChatList.route else Screen.Login.route
+    val startDestination = if (isAuthenticated) Screen.Main.route else Screen.Login.route
 
     LaunchedEffect(isAuthenticated) {
         if (isAuthenticated) {
             // If authenticated, ensure we're not on auth screens
             val currentRoute = navController.currentDestination?.route
             if (currentRoute == Screen.Login.route || currentRoute == Screen.Register.route) {
-                navController.navigate(Screen.ChatList.route) {
+                navController.navigate(Screen.Main.route) {
                     popUpTo(Screen.Login.route) { inclusive = true }
                 }
             }
@@ -47,24 +49,10 @@ fun NavGraph(
         }
     }
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
-    val showBottomBar = currentRoute in listOf(
-        Screen.ChatList.route,
-        Screen.CallList.route,
-        Screen.Profile.route
-    )
-
     Scaffold(
         topBar = {
             if (isAuthenticated) {
                 ConnectionStatusStripe(connectionState = connectionState)
-            }
-        },
-        bottomBar = {
-            if (showBottomBar) {
-                BottomNavigation(navController = navController)
             }
         }
     ) { innerPadding ->
@@ -97,19 +85,8 @@ fun NavGraph(
                 )
             }
 
-            composable(Screen.ChatList.route) {
-                ChatListScreen(
-                    onNavigateToChat = { chatId ->
-                        navController.navigate(Screen.Chat.createRoute(chatId))
-                    },
-                    onNavigateToProfile = {
-                        navController.navigate(Screen.Profile.route)
-                    }
-                )
-            }
-
-            composable(Screen.CallList.route) {
-                CallListScreen()
+            composable(Screen.Main.route) {
+                MainScreen(rootNavController = navController)
             }
 
             composable(
@@ -117,14 +94,6 @@ fun NavGraph(
                 arguments = Screen.Chat.arguments
             ) {
                 ChatScreen(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
-
-            composable(Screen.Profile.route) {
-                ProfileScreen(
                     onNavigateBack = {
                         navController.popBackStack()
                     }

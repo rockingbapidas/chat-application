@@ -1,6 +1,7 @@
 package com.example.whatsappsample.presentation.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Person
@@ -22,7 +23,7 @@ fun BottomNavigation(navController: NavController) {
     val items = listOf(
         BottomNavItem(
             route = Screen.ChatList.route,
-            icon = Icons.Default.Chat,
+            icon = Icons.AutoMirrored.Filled.Chat,
             label = stringResource(R.string.chats)
         ),
         BottomNavItem(

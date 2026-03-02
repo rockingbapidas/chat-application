@@ -17,13 +17,12 @@ import javax.inject.Singleton
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val authRemoteSource: AuthRemoteSource,
-    private val workManager: WorkManager,
-    appPreferences: AppPreferences
+    private val workManager: WorkManager
 ) : AuthRepository {
 
-    override val currentUser: Flow<User?> = appPreferences.currentUser.map { it?.toDomain() }
+    override val currentUser: Flow<User?> = authRemoteSource.currentUser.map { it?.toDomain() }
 
-    override val isUserAuthenticated: Flow<Boolean> = appPreferences.isAuthenticated
+    override val isUserAuthenticated: Flow<Boolean> = authRemoteSource.isUserAuthenticated
 
     override suspend fun signIn(email: String, password: String): Result<User> {
         val result = authRemoteSource.signIn(email, password).map { it.toDomain() }
@@ -39,16 +38,6 @@ class AuthRepositoryImpl @Inject constructor(
             triggerSync()
         }
         return result
-    }
-
-    private fun triggerSync() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-        val workRequest = OneTimeWorkRequestBuilder<InitialSyncWorker>()
-            .setConstraints(constraints)
-            .build()
-        workManager.enqueue(workRequest)
     }
 
     override suspend fun signOut() {
@@ -73,5 +62,15 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun updatePassword(newPassword: String): Result<Unit> {
         return authRemoteSource.updatePassword(newPassword)
+    }
+
+    private fun triggerSync() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val workRequest = OneTimeWorkRequestBuilder<InitialSyncWorker>()
+            .setConstraints(constraints)
+            .build()
+        workManager.enqueue(workRequest)
     }
 }

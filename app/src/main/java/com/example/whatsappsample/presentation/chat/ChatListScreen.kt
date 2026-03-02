@@ -24,38 +24,33 @@ fun ChatListScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Chats") },
-                actions = {
-                    IconButton(onClick = onNavigateToProfile) {
-                        Icon(Icons.Default.Person, contentDescription = "Profile")
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
+    Surface(modifier = Modifier.fillMaxSize()) {
         if (state.isLoading) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                items(state.chats.size) { index ->
-                    ChatListItem(
-                        chat = state.chats[index],
-                        onClick = { onNavigateToChat(state.chats[index].id) }
-                    )
+            Column {
+                TopAppBar(
+                    title = { Text("Chats") },
+                    actions = {
+                        IconButton(onClick = onNavigateToProfile) {
+                            Icon(Icons.Default.Person, contentDescription = "Profile")
+                        }
+                    }
+                )
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(state.chats.size) { index ->
+                        ChatListItem(
+                            chat = state.chats[index],
+                            onClick = { onNavigateToChat(state.chats[index].id) }
+                        )
+                    }
                 }
             }
         }
